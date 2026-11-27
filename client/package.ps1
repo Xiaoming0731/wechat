@@ -1,4 +1,4 @@
-# Qt 客户端打包脚本（Windows）
+﻿# Qt 客户端打包脚本（Windows）
 # 用法（在 Windows PowerShell 中）：
 #   powershell -ExecutionPolicy Bypass -File .\client\package.ps1
 # 前提：已用 Qt 6.9.3 MinGW 以 Release 模式构建出 client\bin\wechat.exe

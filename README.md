@@ -1,8 +1,8 @@
-# 微信风格即时通讯系统（C++ 服务端 + Qt 客户端）
+# 微信风格即时通讯项目（C++ 服务端 + Qt 客户端）
 
-一个从零实现的教学级 IM 项目：muduo 网络库的多线程 TCP 服务端 + Qt 6 Widgets 桌面客户端，支持单聊、群聊、好友申请、离线消息、历史消息、备注与忘记密码等完整链路。
+这是一个个人练习性质的 IM 项目，主要目的是把 muduo 多线程 TCP 服务端和 Qt 6 Widgets 客户端串起来，练习从协议设计到界面联调的完整过程。目前实现了单聊、群聊、好友申请、离线消息、历史消息、备注和修改密码等基础功能，仍有不少可以改进的地方。
 
-服务端通过 **Redis 发布订阅** 在多个实例之间路由消息，前面用 **nginx stream** 做四层负载均衡；MySQL 持久化用户、好友、群组和消息。
+服务端用 Redis 发布订阅在多个实例之间转发消息，前面放一个 nginx stream 做简单的四层转发；用户、好友、群组和消息都持久化在 MySQL 中。
 
 ## 架构
 
@@ -20,7 +20,7 @@ Qt 客户端 ──TCP──> nginx stream :8010 ──轮询──> chat1 :6000
 │  ├─ include/              # 头文件（含公共协议 include/public.hpp）
 │  ├─ src/server/           # 服务主逻辑：chatserver / chatservice / model / db / redis
 │  ├─ thirdparty/json.hpp   # 单头文件 JSON 库
-│  ├─ sql/schema.sql        # 完整建表语句（docker 首次启动自动执行）
+│  ├─ sql/schema.sql        # 建表语句（docker 首次启动自动执行）
 │  ├─ deploy/nginx.conf     # 本地（非容器）nginx 配置
 │  └─ Dockerfile
 ├─ client/                  # Qt 6 Widgets 客户端
@@ -82,7 +82,7 @@ powershell -ExecutionPolicy Bypass -File .\client\package.ps1
 # 输出：client/dist/wechat-windows-x64.zip
 ```
 
-脚本会自动调用 `windeployqt` 拷贝 Qt 依赖（若 Qt 路径不同，用 `-QtBin` 指定 `windeployqt.exe` 所在目录）。
+脚本会调用 `windeployqt` 拷贝 Qt 依赖（若 Qt 路径不同，用 `-QtBin` 指定 `windeployqt.exe` 所在目录）。
 
 > 客户端默认连接 `127.0.0.1:8010`，连接远程服务端时修改 `client/chatservice.cpp` 中的 `_host` 与 `_port`（或本地做端口转发）。
 
@@ -99,3 +99,15 @@ powershell -ExecutionPolicy Bypass -File .\client\package.ps1
 ## 开发过程
 
 按提交阶段归档的历史快照仓库：[the-story-of-wechat](https://github.com/Xiaoming0731/the-story-of-wechat)
+
+## 尚未完成 / 后续计划
+
+项目目前只完成了文字消息相关的基础功能，还不算完整，之后有空会继续补充：
+
+- 表情系统：表情面板、自定义表情、消息内表情渲染
+- 文件传输：发送图片、文件，带进度与断点续传
+- 真实的头像系统：头像上传、裁剪、服务端存储与分发（目前是本地资源占位）
+- 语音聊天：录音、语音消息播放、语音通话
+- 视频聊天：视频通话、画面采集与传输
+- 其他：朋友圈、消息撤回、@ 提醒、多端同步等
+

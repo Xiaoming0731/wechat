@@ -1,0 +1,63 @@
+services:
+  mysql:
+    image: mysql:8.4
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_0900_ai_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456}
+      MYSQL_DATABASE: chat
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./server/sql:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  chat1:
+    build: ./server
+    restart: unless-stopped
+    environment: &chat-env
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASS: ${MYSQL_ROOT_PASSWORD:-123456}
+      DB_NAME: chat
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  chat2:
+    build: ./server
+    restart: unless-stopped
+    environment: *chat-env
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  nginx:
+    build:
+      context: .
+      dockerfile: deploy/nginx.Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    depends_on:
+      - chat1
+      - chat2
+
+volumes:
+  mysql-data:

@@ -1,0 +1,20 @@
+# 构建上下文只保留源码
+build/
+bin/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile*
+*.o
+*.o.d
+*.log
+
+test/
+sql/
+.vscode/
+.idea/
+*.user
+
+.git/
+Dockerfile
+.dockerignore

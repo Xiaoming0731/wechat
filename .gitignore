@@ -1,0 +1,44 @@
+# ===== CMake / C++ 构建产物 =====
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+Makefile.Debug
+Makefile.Release
+build/
+build-*/
+bin/
+*.o
+*.o.d
+*.a
+*.so
+*.so.*
+a.out
+*.bin
+compile_commands.json
+
+# ===== 本地测试/实验构建 =====
+test/muduo/build/
+test/muduo/bin/
+test/json/testjson
+
+# ===== Qt 构建产物 =====
+debug/
+release/
+ui_*.h
+moc_*
+qrc_*
+object_script.*
+.qmake.stash
+*.exe
+
+# ===== 客户端打包输出 =====
+client/dist/
+
+# ===== IDE =====
+.vscode/
+.idea/
+*.user
+
+# ===== 日志 =====
+*.log

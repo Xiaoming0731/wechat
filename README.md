@@ -7,7 +7,7 @@
 ## 架构
 
 ```
-Qt 客户端 ──TCP──> nginx stream :8000 ──轮询──> chat1 :6000 ─┐
+Qt 客户端 ──TCP──> nginx stream :8010 ──轮询──> chat1 :6000 ─┐
                                                    chat2 :6000 ─┼─> MySQL（用户/好友/群/消息）
                                                                 └─> Redis（跨实例消息路由、在线状态通道）
 ```
@@ -38,16 +38,19 @@ Qt 客户端 ──TCP──> nginx stream :8000 ──轮询──> chat1 :6000
 docker compose up -d --build
 ```
 
-启动后客户端连接 `127.0.0.1:8000` 即可。包含的服务：
+启动后客户端连接 `127.0.0.1:8010` 即可。包含的服务：
 
 | 服务 | 说明 |
 |---|---|
 | mysql:8.4 | 首次启动自动执行 `server/sql/schema.sql`，库名 `chat` |
 | redis:7 | 服务端多实例之间的消息路由 |
-| chat1 / chat2 | 同一镜像的两个 ChatServer 实例（6000 端口） |
-| nginx | stream 四层代理，监听 8000，轮询转发到两个实例 |
+| chat1 / chat2 | 同一镜像的两个 ChatServer 实例（容器内 6000 端口） |
+| nginx | stream 四层代理，容器内监听 8000，宿主机映射到 8010 |
 
 - 数据库 root 密码默认 `123456`，可用环境变量覆盖：`MYSQL_ROOT_PASSWORD=xxx docker compose up -d --build`
+- 宿主机 8000 被占用时可改 `docker-compose.yml` 里的 `8010:8000` 映射
+- 构建时 muduo 默认从 GitHub 拉取，国内网络可指定镜像源：
+  `MUDUO_REPO=https://ghfast.top/https://github.com/chenshuo/muduo.git docker compose up -d --build`
 - 停止：`docker compose down`；连数据一起清空：`docker compose down -v`
 
 ## 服务端本地开发（Linux / WSL）
@@ -81,7 +84,7 @@ powershell -ExecutionPolicy Bypass -File .\client\package.ps1
 
 脚本会自动调用 `windeployqt` 拷贝 Qt 依赖（若 Qt 路径不同，用 `-QtBin` 指定 `windeployqt.exe` 所在目录）。
 
-> 客户端默认连接 `127.0.0.1:8000`，连接远程服务端时修改 `client/chatservice.cpp` 中的 `_host` 与 `_port`（或本地做端口转发）。
+> 客户端默认连接 `127.0.0.1:8010`，连接远程服务端时修改 `client/chatservice.cpp` 中的 `_host` 与 `_port`（或本地做端口转发）。
 
 ## 技术栈
 

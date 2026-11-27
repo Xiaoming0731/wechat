@@ -40,7 +40,7 @@ ChatService::ChatService(QObject *parent)
     : QObject(parent),
       _client(new TcpClient(this)),
       _host("127.0.0.1"),
-      _port(8000),   // nginx stream 集群入口，后端是 6001/6002
+      _port(8010),   // nginx stream 集群入口，后端是 6001/6002
       _connecting(false),
       _userId(0),
       _applyUnread(false),
